@@ -5,26 +5,37 @@ import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
 import "@/styles/globals.css";
 import { MantineProvider } from "@mantine/core";
+import { SessionProvider } from "next-auth/react";
+import Layer from "@/components/Layer";
+import { RecoilRoot } from "recoil";
+import RecoilNexus from "recoil-nexus";
 
 const MyApp: AppType = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <MantineProvider
-      withGlobalStyles
-      withNormalizeCSS
-      theme={{
-        /** Put your mantine theme override here */
-        colorScheme: "light",
-      }}
-    >
-      <Component {...pageProps} />
-    </MantineProvider>
+    <RecoilRoot>
+      <RecoilNexus />
+      <SessionProvider session={session}>
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{
+            /** Put your mantine theme override here */
+            colorScheme: "light",
+          }}
+        >
+          <Layer>
+            <Component {...pageProps} />
+          </Layer>
+        </MantineProvider>
+      </SessionProvider>
+    </RecoilRoot>
   );
 };
 
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   if (typeof window !== undefined) return ""; // browser should use relative url
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost

@@ -2,6 +2,9 @@ import type { NextPage } from "next";
 import { trpc } from "@/utils/trpc";
 
 import { Text } from "@mantine/core";
+import { useEffect } from "react";
+import { setLoading } from "@/store/loading";
+import AuthLayer from "@/components/AuthLayer";
 
 const Home: NextPage = () => {
   const hello = trpc.useQuery([
@@ -9,13 +12,15 @@ const Home: NextPage = () => {
     { text: "from v2.starter.nextjs" },
   ]);
 
+  setLoading(true);
+
+  useEffect(() => {
+    setLoading(hello.isLoading);
+  }, [hello]);
+
   return (
     <>
-      <div className='pt-6 text-2xl text-blue-500 flex justify-center items-center w-full'>
-        <Text>
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading...</p>}
-        </Text>
-      </div>
+      <Text>{hello.data ? <p>{hello.data.greeting}</p> : ""}</Text>
     </>
   );
 };
